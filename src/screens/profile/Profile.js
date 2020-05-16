@@ -147,7 +147,8 @@ class Profile extends Component {
         if (this.state.editFullName === '') {
             return;
         } else {
-            this.setState({ full_name: this.state.editFullName });
+            this.setState({ full_name: this.state.editFullName, editNameOpen: false,
+                fullnameRequired: 'dispNone' });
         }
     }
 
@@ -195,12 +196,13 @@ class Profile extends Component {
         let _selectedPostItem = this.state.selectedPost;
         let _userPosts = this.state.userPosts;
         const _selectedIndex = this.state.selectedIndex;
+        
         if (_selectedPostItem.user_has_liked) {
             _selectedPostItem.user_has_liked = false;
-            _selectedPostItem.likes.count = (_selectedPostItem.likes.count) - 1;
+            _selectedPostItem.likes.count = (_selectedPostItem.likes.count) + 1;
         } else {
             _selectedPostItem.user_has_liked = true;
-            _selectedPostItem.likes.count = (_selectedPostItem.likes.count) + 1;
+            _selectedPostItem.likes.count = (_selectedPostItem.likes.count) - 1;
         }
 
         _userPosts[_selectedIndex] = _selectedPostItem;
@@ -256,12 +258,12 @@ class Profile extends Component {
             <div>
                 <Header profileIcon={true} profilePicture={this.state.profile_picture} profileUserName={this.state.username} />
                 <Container fixed>
-                    <Grid container spacing={3} justify="flex-start" alignItems="center">
-                        <Grid item >
+                    <Grid container spacing={3} justify="flex-start" alignItems="center" style={{'paddingTop':8 , 'paddingBottom':8}}>
+                        <Grid item xs={4} className="avatar-grid">
                             <Avatar alt={this.state.username} src={this.state.profile_picture} className={classes.bigAvatar} />
                         </Grid>
-                        <Grid item >
-                            <Typography variant="h6" component="h6">
+                        <Grid item  xs={6}>
+                            <Typography variant="h6" component="h6" style={{'paddingBottom':12}}>
                                 {this.state.username}
                             </Typography>
                             <Grid container spacing={3} justify="space-between" alignItems="center">
@@ -320,7 +322,7 @@ class Profile extends Component {
                     <GridList cellHeight={320} cols={3} >
                         {(this.state.userPosts || []).map((post, index) => (
                             <GridListTile key={post.id} className="grid-item" onClick={() => this.handlePostClickHandler(post.id, index)}>
-                                <img src={post.images.low_resolution.url} alt={post.caption.text} />
+                                <img src={post.images.standard_resolution.url} alt={post.caption.text} />
                             </GridListTile>
                         ))}
 
