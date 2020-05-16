@@ -8,8 +8,8 @@ import CardMedia from '@material-ui/core/CardMedia';
 import CardContent from '@material-ui/core/CardContent';
 import Divider from '@material-ui/core/Divider';
 import Avatar from '@material-ui/core/Avatar';
-import FavoriteBorder from '@material-ui/icons/FavoriteBorder';
 import Favorite from '@material-ui/icons/Favorite';
+import FavoriteBorder from '@material-ui/icons/FavoriteBorder';
 import Typography from '@material-ui/core/Typography';
 import Grid from '@material-ui/core/Grid';
 import InputLabel from '@material-ui/core/InputLabel';
@@ -31,10 +31,7 @@ class Home extends Component {
             full_name: '',
             access_token: sessionStorage.getItem('access-token'),
             userPosts: null,
-            filteredUserPosts: null,
-            selectedPost: null,
-            selectedIndex: -1,
-            addNewComment: ''
+            filteredUserPosts: null
         };
 
     }
@@ -138,13 +135,7 @@ class Home extends Component {
         return moment(new Date(parseInt(_milliseconds))).format('DD/MM/YY HH:mm:ss');
     }
 
-    /**
-     * @memberof Home
-     * @description Set state addNewComment on value change
-     *
-    inputAddCommentChangeHandler = (e) => {
-        this.setState({ addNewComment: e.target.value });
-    }*/
+
 
     /**
      * @memberof Home
@@ -152,27 +143,48 @@ class Home extends Component {
      */
     addCommentClickHandler = (_id, _index) => {
 
-        if (this.state.addNewComment === "") {
+        const _commentField = document.getElementById('addcomment'+_id);
+        const _commentValue = _commentField.value;
+
+        if (_commentValue === '') {
             return;
         } else {
-            let _userPostItems = this.state.userPosts;
-            let _selectedPostItem = _userPostItems[_index];
-            _selectedPostItem.comments['data'] = _selectedPostItem.comments['data'] || [];
-            _selectedPostItem.comments['data'].push({
-                id: (_selectedPostItem.comments['data'].length + 1) ,
-                comment_by: this.state.username,
-                comment_value: this.state.addNewComment
+            let _userPosts = JSON.parse(JSON.stringify(this.state.userPosts));
+            let _filteredPosts = JSON.parse(JSON.stringify(this.state.filteredUserPosts));
+
+            // Updating main array
+            let _updatedPosts =  _userPosts.map((post,index) => {
+                if(post.id === _id){
+                    post.comments['data'] = post.comments['data'] || [];
+                    post.comments['data'].push({
+                        id: (post.comments['data'].length + 1) ,
+                        comment_by: this.state.username,
+                        comment_value: _commentValue
+                    });
+
+                }
+                return post;
             });
-
-            let _userPosts = this.state.userPosts;
-            const _selectedIndex = this.state.selectedIndex;
-            _userPosts[_selectedIndex] = _selectedPostItem;
-
+            
+            // Updating filtered array
+            if(_filteredPosts !== null && _filteredPosts.length > 0) {
+                _filteredPosts[_index].comments['data'] = _filteredPosts[_index].comments['data'] || [];
+                _filteredPosts[_index].comments['data'].push({
+                        id: (_filteredPosts[_index].comments['data'].length + 1) ,
+                        comment_by: this.state.username,
+                        comment_value: _commentValue
+                });
+            } 
+            
+            // setting updated arrays to state
             this.setState({
-                selectedPost: _selectedPostItem,
-                userPosts: _userPosts,
-                addNewComment: ''
+                userPosts: [..._updatedPosts],
+                filteredUserPosts: [..._filteredPosts]
             });
+
+            // Reset field value
+            document.getElementById('addcomment'+_id).value = '';
+
         }
     }
 
@@ -219,7 +231,8 @@ class Home extends Component {
                                         </Grid>
                                         <Grid container spacing={1} justify="flex-start" alignItems="center">
                                             <Grid item>
-                                                {post.user_has_liked ? 
+                                                
+                                            {post.user_has_liked ? 
                                                     <FavoriteBorder className={'greyColor'} 
                                                                     onClick={this.likesClickHandler.bind(this, post.id, index)} 
                                                     />
@@ -245,14 +258,14 @@ class Home extends Component {
                                             </Grid>
                                         </Grid>                                                    
                                         <Grid container spacing={2} justify="flex-start" alignItems="center">
-                                            <Grid item >
+                                            <Grid item className="flex-grow-1">
                                                 <FormControl className="formControl">
                                                     <InputLabel htmlFor="addcomment">Add a comment </InputLabel>
-                                                    <Input id="addcomment" type="text" onChange={this.inputAddCommentChangeHandler} />
+                                                    <Input id={"addcomment"+ post.id } type="text" />
                                                 </FormControl>
                                             </Grid>
                                             <Grid item >
-                                                <Button key={post.id} variant="contained" color="primary" onClick={this.addCommentClickHandler(post.id, index)}>
+                                                <Button variant="contained" color="primary" onClick={this.addCommentClickHandler.bind(this, post.id, index)}>
                                                     ADD
                                                 </Button>
                                             </Grid>
