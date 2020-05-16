@@ -1,23 +1,38 @@
 import React, { Component } from 'react';
-import Home from '../screens/home/Home';
-import Login from '../screens/login/Login';
-import Profile from '../screens/profile/Profile';
-import { BrowserRouter as Router, Route } from 'react-router-dom';
+import Home from './home/Home';
+import Login from './login/Login';
+import Profile from './profile/Profile';
+import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
+import  PrivateRoute  from '../common/PrivateRoute';
 
 class Controller extends Component {
 
   constructor()
   {
     super();
-    this.baseUrl = "http://54.255.154.11:8080/api/v1/";
+    // this.baseUrl = "http://54.255.154.11:8080/api/v1/";
+    this.state = {
+      loggedIn: sessionStorage.getItem('access-token') == null ? false : true
+    }
   }
+
   render(){
     return(
       <Router>
          <div className="main-container">
-     	    <Route exact path='/' render={(props) => <Login {...props} /> }  />
-            <Route path='/home' render={(props) => <Home {...props} /> } />
-            <Route path='/profile' render={(props) => <Profile {...props}/> } />
+           <Switch>
+              <Route exact path='/' render={(props) => <Login {...props}/> }  />
+              <PrivateRoute 
+                  exact 
+                  path='/home'
+                  component={Home} 
+                  render={(props) => (<Home {...props} /> )} /> 
+              <PrivateRoute 
+                exact 
+                path='/profile' 
+                component={Profile} 
+                render={(props) => (<Profile {...props}/>)}   />
+            </Switch>
         </div>
       </Router>
 
