@@ -1,22 +1,21 @@
 import React, { Component } from 'react';
-import './Header.css';
+// import ReactDOM from 'react-dom';
+import './Home.css';
+import Header from '../../common/header/Header';
 
+class Home extends Component {
 
-class Header extends Component {
-
-    // constructor() {
-    //     super();
-    // }
-
-    render() {
+    render(){
         return(
             <div>
-                <header className="app-header">
-                    <div className="app-logo">Image Viewer</div>
-                </header>
+                <Header />
+                <div>
+                    You are in home
+                </div>
             </div>
         )
     }
+
 }
 
-export default Header;
+export default Home;
